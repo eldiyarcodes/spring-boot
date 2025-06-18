@@ -1,5 +1,6 @@
     package com.example.demo.services;
 
+    import com.example.demo.exceptions.EmailAlreadyExistsException;
     import com.example.demo.exceptions.UserNotFoundException;
     import com.example.demo.repository.User;
     import com.example.demo.repository.UserRepository;
@@ -36,7 +37,7 @@
         public void deleteUser(Long id) {
             Optional<User> optionalUser = userRepository.findById(id);
             if (!optionalUser.isPresent()) {
-                throw new IllegalStateException("A user with this id " + id + " exists");
+                throw new UserNotFoundException("No user with id " + id + " found");
             }
 
             userRepository.deleteById(id);
@@ -45,7 +46,7 @@
         public User updateUser(Long id, String name, String email) {
             Optional<User> optionalUser = userRepository.findById(id);
             if (!optionalUser.isPresent()) {
-                throw new IllegalStateException("No user with id " + id + " found");
+                throw new UserNotFoundException("No user with id " + id + " found");
             }
 
             User user = optionalUser.get();
@@ -53,7 +54,7 @@
             if (email != null && !email.equals(user.getEmail())) {
                 Optional<User> foundByEmail = userRepository.findByEmail(email);
                 if (foundByEmail.isPresent()) {
-                    throw new IllegalStateException("This email already exists");
+                    throw new EmailAlreadyExistsException("This email already exists");
                 }
 
                 user.setEmail(email);
